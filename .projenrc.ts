@@ -1,8 +1,8 @@
 import { awscdk } from 'projen';
 const project = new awscdk.AwsCdkConstructLibrary({
-  author: 'm-yamagishi',
+  author: 'Masaru Yamagishi',
   authorAddress: 'm-yamagishi@infiniteloop.co.jp',
-  cdkVersion: '2.1.0',
+  cdkVersion: '2.151.0',
   defaultReleaseBranch: 'main',
   jsiiVersion: '~5.4.0',
   name: 'aws-cdk-appdp',
