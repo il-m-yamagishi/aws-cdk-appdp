@@ -6,7 +6,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   cdkVersion: '2.151.0',
   defaultReleaseBranch: 'main',
   jsiiVersion: '~5.4.0',
-  name: 'aws-cdk-appdp',
+  name: '@m-yamagishi/aws-cdk-appdp',
   projenrcTs: true,
   repositoryUrl: 'https://github.com/il-m-yamagishi/aws-cdk-appdp.git',
   npmProvenance: true,
@@ -14,7 +14,10 @@ const project = new awscdk.AwsCdkConstructLibrary({
 
   // deps: [],                /* Runtime dependencies of this module. */
   description: 'AWS CDK Typical application deployment for AWS Fargate, alternative to AWS CDK Pipelines.', /* The description is just a string that helps people understand the purpose of the package. */
-  // devDeps: [],             /* Build dependencies for this module. */
-  packageName: '@m-yamagishi/aws-cdk-appdp', /* The "name" in package.json. */
+  devDeps: [
+    '@aws-cdk/integ-runner@^2.151.0',
+    '@aws-cdk/integ-tests-alpha',
+  ],
+  packageName: '@m-yamagishi/aws-cdk-appdp',
 });
 project.synth();
