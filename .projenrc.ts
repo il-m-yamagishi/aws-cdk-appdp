@@ -10,8 +10,8 @@ const project = new awscdk.AwsCdkConstructLibrary({
   repositoryUrl: 'https://github.com/m-yamagishi/aws-cdk-appdp.git',
 
   // deps: [],                /* Runtime dependencies of this module. */
-  description: "AWS CDK Typical application deployment for AWS Fargate, alternative to AWS CDK Pipelines.",  /* The description is just a string that helps people understand the purpose of the package. */
+  description: 'AWS CDK Typical application deployment for AWS Fargate, alternative to AWS CDK Pipelines.',  /* The description is just a string that helps people understand the purpose of the package. */
   // devDeps: [],             /* Build dependencies for this module. */
-  packageName: "aws-cdk-appdp",  /* The "name" in package.json. */
+  packageName: 'aws-cdk-appdp',  /* The "name" in package.json. */
 });
 project.synth();
