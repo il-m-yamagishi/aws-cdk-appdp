@@ -1,5 +1,5 @@
 {
-  "name": "aws-cdk-appdp",
+  "name": "@m-yamagishi/aws-cdk-appdp",
   "description": "AWS CDK Typical application deployment for AWS Fargate, alternative to AWS CDK Pipelines.",
   "repository": {
     "type": "git",
@@ -66,9 +66,6 @@
   ],
   "main": "lib/index.js",
   "license": "Apache-2.0",
-  "publishConfig": {
-    "access": "public"
-  },
   "version": "0.0.0",
   "jest": {
     "coverageProvider": "v8",
