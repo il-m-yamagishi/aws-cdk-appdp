@@ -1,10 +1,14 @@
-import { Artifact, IAction, Pipeline, PipelineProps } from 'aws-cdk-lib/aws-codepipeline'
+import { Pipeline } from 'aws-cdk-lib/aws-codepipeline';
+import { CodeBuildAction } from 'aws-cdk-lib/aws-codepipeline-actions';
 import { Construct } from 'constructs';
+import { AppDpBuildDefinition } from './app-dp-build-definition';
+import { AppDpCluster } from './app-dp-cluster';
+import { AppDpSource } from './app-dp-source';
 
 /**
  * Properties for AppDpPipeline
  */
-export interface AppDpPipelineProps extends PipelineProps {
+export interface AppDpPipelineProps {
   /**
    * The source action that will trigger the pipeline
    * This can be a CodeCommit, GitHub, S3 or any other source action
@@ -19,52 +23,75 @@ export interface AppDpPipelineProps extends PipelineProps {
    * ```ts
    * const oauthToken = SecretValue.secretsManager('my-github-token');
    * const branch = 'main'; // Target branch
-   * const sourceOutput = new codepipeline.Artifact();
-   * const sourceAction = new GitHubSourceAction({
-   *   actionName: 'GitHub_Source',
+   * const sourceAction = AppDpSource.fromGitHub({
    *   owner: 'il-m-yamagishi',
    *   repo: 'aws-cdk-appdp',
-   *   output: sourceOutput,
    *   oauthToken,
    *   branch,
    * });
    * ```
    */
-  readonly sourceAction: IAction;
+  readonly sourceAction: AppDpSource;
 
   /**
-   * The build output artifact that will be used as input for the next stage
+   * The build definitions that will build the Docker images
    */
-  readonly sourceArtifact: Artifact;
+  readonly buildDefinitions: AppDpBuildDefinition[];
 
   /**
-   * The path to the Dockerfile that will be used to build the Docker image
+   * The cluster that the application will be deployed to
    */
-  readonly dockerfilePath: string;
+  readonly cluster: AppDpCluster;
+
+  /**
+   * Whether the pipeline requires manual approval before deploying the application
+   */
+  readonly needManualApproval?: boolean;
 }
 
 /**
  * An AppDpPipeline that deploys the application to specified source.
- * This is a custom construct that extends CodePipeline construct.
  *
  * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline-readme.html
  * @see https://github.com/aws/aws-cdk/issues/1559
  * @see https://aws.amazon.com/blogs/devops/blue-green-deployments-using-aws-cdk-pipelines-and-aws-codedeploy/
- * @see https://dev.classmethod.jp/articles/cdk-ecr-ecs-bluegreen-deployment/ (JP)
+ * @see https://github.com/tsukuboshi/cdk-microservices-bluegreendeployment-template
  */
-export class AppDpPipeline extends Pipeline {
+export class AppDpPipeline extends Construct {
+  public readonly pipeline: Pipeline;
+
   /**
    * Constructor
    * User must provide props that does not include any stages
    */
   public constructor(scope: Construct, id: string, props: AppDpPipelineProps) {
-    super(scope, id, props);
-    if (this.stageCount > 0) {
-      throw new Error('AppDpPipeline must not have any stages');
-    }
-    this.addStage({
-      stageName: 'Source',
-      actions: [props.sourceAction],
+    super(scope, id);
+
+    this.pipeline = new Pipeline(this, 'Pipeline', {
+      pipelineName: `deploy-${id.toLowerCase()}`,
     });
+
+    // Source stages
+    this.pipeline.addStage({
+      stageName: 'Source',
+      actions: [props.sourceAction.sourceAction],
+    });
+
+    // Build stages
+    this.pipeline.addStage({
+      stageName: 'Build images',
+      actions: props.buildDefinitions.map((definition) => (new CodeBuildAction({
+        actionName: `Build_${definition.repository.repositoryName}`,
+        project: definition.codeBuildProject,
+        input: props.sourceAction.sourceArtifact,
+        environmentVariables: {
+          COMMIT_ID: {
+            value: props.sourceAction.commitId,
+          },
+        },
+      }))),
+    });
+
+    // Deploy stages
   }
 }
