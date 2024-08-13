@@ -15,8 +15,8 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // deps: [],                /* Runtime dependencies of this module. */
   description: 'AWS CDK Typical application deployment for AWS Fargate, alternative to AWS CDK Pipelines.', /* The description is just a string that helps people understand the purpose of the package. */
   devDeps: [
-    '@aws-cdk/integ-runner@^2.151.0',
-    '@aws-cdk/integ-tests-alpha',
+    '@aws-cdk/integ-runner@latest',
+    '@aws-cdk/integ-tests-alpha@latest',
   ],
   packageName: '@m-yamagishi/aws-cdk-appdp',
 });

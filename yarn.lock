@@ -33,7 +33,7 @@
     "@aws-cdk/service-spec-types" "^0.0.81"
     "@cdklabs/tskb" "^0.0.3"
 
-"@aws-cdk/integ-runner@^2.151.0":
+"@aws-cdk/integ-runner@latest":
   version "2.151.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/integ-runner/-/integ-runner-2.151.0-alpha.0.tgz#ed7b82f3de7f99193b4ab2b2c60a83287a5db22c"
   integrity sha512-+EAL0ZmYiIsF1LmlVphGTOcGDhSSAIqapRZ2wETSnzIti6qEsypLv302WWFqsE3jyPX7d6feUOFrfmR9yTg0Vg==
@@ -43,7 +43,7 @@
   optionalDependencies:
     fsevents "2.3.2"
 
-"@aws-cdk/integ-tests-alpha@^2.151.0-alpha.0":
+"@aws-cdk/integ-tests-alpha@latest":
   version "2.151.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/integ-tests-alpha/-/integ-tests-alpha-2.151.0-alpha.0.tgz#857852e54115194264deff71582b0abab68e8680"
   integrity sha512-mTrpkwtR9F0dE9Z4kn4PyDGdhRNiycCc5lqFwliSWVCRS0n0tg3ucAcDnnRT4SvEbUpq5+Wsuf9MUosMK39WVQ==
