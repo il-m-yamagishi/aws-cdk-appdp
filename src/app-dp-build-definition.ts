@@ -33,12 +33,12 @@ export class AppDpBuildDefinition extends Construct {
    * @link https://github.com/awslabs/soci-snapshotter/releases
    * @link https://github.com/aws-samples/aws-fargate-seekable-oci-toolbox/
    */
-  public readonly SOCI_VERSION = '0.7.0';
+  public static readonly SOCI_VERSION = '0.7.0';
 
   /**
    * @link https://github.com/docker/buildx/releases
    */
-  public readonly BUILDX_VERSION = '0.16.2';
+  public static readonly BUILDX_VERSION = '0.16.2';
 
   /**
    * The ECR repository that will be used to store the Docker image
@@ -82,11 +82,11 @@ export class AppDpBuildDefinition extends Construct {
       },
       SOCI_VERSION: {
         type: BuildEnvironmentVariableType.PLAINTEXT,
-        value: this.SOCI_VERSION,
+        value: AppDpBuildDefinition.SOCI_VERSION,
       },
       BUILDX_VERSION: {
         type: BuildEnvironmentVariableType.PLAINTEXT,
-        value: this.BUILDX_VERSION,
+        value: AppDpBuildDefinition.BUILDX_VERSION,
       },
     };
 

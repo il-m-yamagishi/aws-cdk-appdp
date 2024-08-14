@@ -19,7 +19,8 @@ export interface AppDpPipelineProps {
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.CodeStarConnectionsSourceAction.html
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.S3SourceAction.html
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.GitHubSourceAction.html
-   * @example
+   * Example:
+   *
    * ```ts
    * const oauthToken = SecretValue.secretsManager('my-github-token');
    * const branch = 'main'; // Target branch
