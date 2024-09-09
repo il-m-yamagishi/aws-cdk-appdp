@@ -31,17 +31,16 @@
   },
   "author": {
     "name": "Masaru Yamagishi",
-    "email": "m-yamagishi@infiniteloop.co.jp",
+    "email": "m.yamagishi90+git@gmail.com",
     "organization": false
   },
   "devDependencies": {
-    "@aws-cdk/integ-runner": "latest",
-    "@aws-cdk/integ-tests-alpha": "latest",
     "@types/jest": "^29.5.12",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^7",
     "@typescript-eslint/parser": "^7",
     "aws-cdk-lib": "2.151.0",
+    "commit-and-tag-version": "^12",
     "constructs": "10.0.5",
     "eslint": "^8",
     "eslint-import-resolver-typescript": "^3.6.3",
@@ -54,7 +53,6 @@
     "jsii-pacmak": "^1.103.1",
     "jsii-rosetta": "~5.4.0",
     "projen": "^0.86.6",
-    "standard-version": "^9",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
