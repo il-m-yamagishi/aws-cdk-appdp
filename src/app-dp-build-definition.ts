@@ -207,7 +207,7 @@ export class AppDpBuildDefinition extends Construct {
               'printf \'{"ImageURI":"%s"}\' "${REPOSITORY_URI}:${COMMIT_ID}" > imageDetail.json',
               'printf "${APP_SPEC_JSON_TEMPLATE}" "${TASK_DEFINITION_ARN}" "${CONTAINER_NAME}" > appspec.yaml',
             ],
-          }
+          },
         },
         artifacts: {
           files: [

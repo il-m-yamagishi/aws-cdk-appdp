@@ -85,7 +85,7 @@ Any object.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.codeBuildProject">codeBuildProject</a></code> | <code>aws-cdk-lib.aws_codebuild.Project</code> | The CodeBuild project that will build the Docker image with Linux AMD64 architecture. |
+| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.codeBuildProject">codeBuildProject</a></code> | <code>aws-cdk-lib.aws_codebuild.Project</code> | The CodeBuild project that will build the Docker image. |
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.repository">repository</a></code> | <code>aws-cdk-lib.aws_ecr.IRepository</code> | The ECR repository that will be used to store the Docker image. |
 
 ---
@@ -110,7 +110,7 @@ public readonly codeBuildProject: Project;
 
 - *Type:* aws-cdk-lib.aws_codebuild.Project
 
-The CodeBuild project that will build the Docker image with Linux AMD64 architecture.
+The CodeBuild project that will build the Docker image.
 
 ---
 
@@ -130,8 +130,8 @@ The ECR repository that will be used to store the Docker image.
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.BUILDX_VERSION">BUILDX_VERSION</a></code> | <code>string</code> | *No description.* |
-| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.SOCI_VERSION">SOCI_VERSION</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.BUILDX_VERSION">BUILDX_VERSION</a></code> | <code>string</code> | The version of the Docker Buildx plugin that will be used to build Docker images. |
+| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinition.property.SOCI_VERSION">SOCI_VERSION</a></code> | <code>string</code> | The version of the SOCI tool that will be used to create and push Docker images. |
 
 ---
 
@@ -142,6 +142,8 @@ public readonly BUILDX_VERSION: string;
 ```
 
 - *Type:* string
+
+The version of the Docker Buildx plugin that will be used to build Docker images.
 
 > [https://github.com/docker/buildx/releases](https://github.com/docker/buildx/releases)
 
@@ -154,6 +156,8 @@ public readonly SOCI_VERSION: string;
 ```
 
 - *Type:* string
+
+The version of the SOCI tool that will be used to create and push Docker images.
 
 > [https://github.com/aws-samples/aws-fargate-seekable-oci-toolbox/](https://github.com/aws-samples/aws-fargate-seekable-oci-toolbox/)
 
@@ -612,6 +616,8 @@ public readonly sourceArtifact: Artifact;
 
 ### AppDpBuildDefinitionProps <a name="AppDpBuildDefinitionProps" id="@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps"></a>
 
+Properties for defining a AppDpBuildDefinition.
+
 #### Initializer <a name="Initializer" id="@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.Initializer"></a>
 
 ```typescript
@@ -627,6 +633,7 @@ const appDpBuildDefinitionProps: AppDpBuildDefinitionProps = { ... }
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.buildArgs">buildArgs</a></code> | <code>{[ key: string ]: string}</code> | The build arguments that will be passed to the Docker build command. |
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.directory">directory</a></code> | <code>string</code> | The path to the Dockerfile that will be used to build the Docker image. |
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.disableArm64Build">disableArm64Build</a></code> | <code>boolean</code> | Whether to disable the ARM64 build. |
+| <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.imageScanOnPush">imageScanOnPush</a></code> | <code>boolean</code> | Whether to scan the Docker image for vulnerabilities. |
 | <code><a href="#@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.target">target</a></code> | <code>string</code> | The target stage in the Dockerfile that will be used to build the Docker image. |
 
 ---
@@ -638,6 +645,7 @@ public readonly buildArgs: {[ key: string ]: string};
 ```
 
 - *Type:* {[ key: string ]: string}
+- *Default:* undefined
 
 The build arguments that will be passed to the Docker build command.
 
@@ -650,6 +658,7 @@ public readonly directory: string;
 ```
 
 - *Type:* string
+- *Default:* .
 
 The path to the Dockerfile that will be used to build the Docker image.
 
@@ -662,8 +671,22 @@ public readonly disableArm64Build: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether to disable the ARM64 build.
+
+---
+
+##### `imageScanOnPush`<sup>Optional</sup> <a name="imageScanOnPush" id="@m-yamagishi/aws-cdk-appdp.AppDpBuildDefinitionProps.property.imageScanOnPush"></a>
+
+```typescript
+public readonly imageScanOnPush: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Whether to scan the Docker image for vulnerabilities.
 
 ---
 
@@ -674,6 +697,7 @@ public readonly target: string;
 ```
 
 - *Type:* string
+- *Default:* undefined
 
 The target stage in the Dockerfile that will be used to build the Docker image.
 
@@ -853,6 +877,7 @@ public readonly sourceAction: AppDpSource;
 The source action that will trigger the pipeline This can be a CodeCommit, GitHub, S3 or any other source action that implements the IAction interface It must be provided by the user.
 
 > [https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.GitHubSourceAction.html
+
 Example:
 
 ```ts
@@ -865,6 +890,7 @@ oauthToken,
 branch,
 });
 ```](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.GitHubSourceAction.html
+
 Example:
 
 ```ts
@@ -996,6 +1022,7 @@ public readonly desiredCount: number;
 ```
 
 - *Type:* number
+- *Default:* 1
 
 The desired number of tasks that should be running in the service.
 
@@ -1008,6 +1035,7 @@ public readonly enableExecuteCommand: boolean;
 ```
 
 - *Type:* boolean
+- *Default:* false
 
 Whether to enable the execute command feature for the service.
 
@@ -1020,6 +1048,7 @@ public readonly securityGroups: ISecurityGroup[];
 ```
 
 - *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup[]
+- *Default:* []
 
 The security groups that will be attached to the service.
 
@@ -1032,6 +1061,7 @@ public readonly vpcSubnets: SubnetSelection;
 ```
 
 - *Type:* aws-cdk-lib.aws_ec2.SubnetSelection
+- *Default:* undefined
 
 The subnets that the service will be deployed to.
 
