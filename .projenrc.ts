@@ -8,7 +8,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   jsiiVersion: '~5.4.0',
   name: '@m-yamagishi/aws-cdk-appdp',
   projenrcTs: true,
-  repositoryUrl: 'https://github.com/il-m-yamagishi/aws-cdk-appdp.git',
+  repositoryUrl: 'https://github.com/yamayuski/aws-cdk-appdp.git',
   npmProvenance: true,
   npmAccess: NpmAccess.PUBLIC,
 

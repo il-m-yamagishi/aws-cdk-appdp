@@ -9,33 +9,53 @@ import {
 import { IRepository, Repository, TagMutability } from 'aws-cdk-lib/aws-ecr';
 import { Construct } from 'constructs';
 
+/**
+ * Properties for defining a AppDpBuildDefinition
+ */
 export interface AppDpBuildDefinitionProps {
   /**
    * The path to the Dockerfile that will be used to build the Docker image
+   *
+   * @default - .
    */
   readonly directory?: string;
   /**
    * The build arguments that will be passed to the Docker build command
+   *
+   * @default - undefined
    */
   readonly buildArgs?: Record<string, string>;
   /**
    * The target stage in the Dockerfile that will be used to build the Docker image
+   *
+   * @default - undefined
    */
   readonly target?: string;
   /**
    * Whether to disable the ARM64 build
+   *
+   * @default - false
    */
   readonly disableArm64Build?: boolean;
+
+  /**
+   * Whether to scan the Docker image for vulnerabilities
+   *
+   * @default - true
+   */
+  readonly imageScanOnPush?: boolean;
 }
 
 export class AppDpBuildDefinition extends Construct {
   /**
+   * The version of the SOCI tool that will be used to create and push Docker images
    * @link https://github.com/awslabs/soci-snapshotter/releases
    * @link https://github.com/aws-samples/aws-fargate-seekable-oci-toolbox/
    */
   public static readonly SOCI_VERSION = '0.7.0';
 
   /**
+   * The version of the Docker Buildx plugin that will be used to build Docker images
    * @link https://github.com/docker/buildx/releases
    */
   public static readonly BUILDX_VERSION = '0.16.2';
@@ -46,7 +66,7 @@ export class AppDpBuildDefinition extends Construct {
   public readonly repository: IRepository;
 
   /**
-   * The CodeBuild project that will build the Docker image with Linux AMD64 architecture
+   * The CodeBuild project that will build the Docker image
    */
   public readonly codeBuildProject: Project;
 
@@ -54,7 +74,7 @@ export class AppDpBuildDefinition extends Construct {
     super(scope, id);
 
     this.repository = new Repository(this, 'EcrRepository', {
-      imageScanOnPush: true,
+      imageScanOnPush: props?.imageScanOnPush ?? true,
       imageTagMutability: TagMutability.MUTABLE, // for cache tag
       removalPolicy: RemovalPolicy.DESTROY,
       repositoryName: `${id.toLowerCase()}`,
@@ -71,6 +91,10 @@ export class AppDpBuildDefinition extends Construct {
       REPOSITORY_URI: {
         type: BuildEnvironmentVariableType.PLAINTEXT,
         value: this.repository.repositoryUri,
+      },
+      CONTAINER_NAME: {
+        type: BuildEnvironmentVariableType.PLAINTEXT,
+        value: this.repository.repositoryName,
       },
       AWS_REGION: {
         type: BuildEnvironmentVariableType.PLAINTEXT,
@@ -97,8 +121,8 @@ export class AppDpBuildDefinition extends Construct {
       '--cache-to mode=max,image-manifest=true,oci-mediatypes=true,type=registry,ref=${REPOSITORY_URI}:cache-${CPU_ARCH}',
       '--output type=docker,dest=./image-${CPU_ARCH}.tar',
       '--platform linux/${CPU_ARCH}',
-      `${props?.buildArgs ? Object.entries(props.buildArgs).map(([key, value]) => `--build-arg ${key}=${value}`).join(' ') : ''} ` +
-      `${props?.target ? `--target ${props.target} ` : ''} ` +
+      `${props?.buildArgs ? Object.entries(props.buildArgs).map(([key, value]) => `--build-arg ${key}=${value}`).join(' ') : ''}`,
+      `${props?.target ? `--target ${props.target} ` : ''}`,
       `${props?.directory ?? '.'}`,
     ];
     const dockerBuildAndPushCommands = [
@@ -112,13 +136,19 @@ export class AppDpBuildDefinition extends Construct {
 
     this.codeBuildProject = new PipelineProject(this, 'CodeBuildProject', {
       projectName: `${id}CodeBuildProject`,
-      description: `CodeBuild project for building Docker image for multi-arch ${id}`,
+      description: `CodeBuild project for building Docker image ${id}`,
       environment: {
         buildImage: LinuxBuildImage.STANDARD_7_0,
         privileged: true, // for Docker build
         environmentVariables: {
           CONTAINERD_ADDRESS: {
             value: '/var/run/containerd/containerd.sock',
+          },
+          CPU_ARCH: {
+            value: 'amd64',
+          },
+          APP_SPEC_JSON_TEMPLATE: {
+            value: '{"version":"0.0","Resources":[{"TargetService":{"Type":"AWS::ECS::Service","Properties":{"TaskDefinition":"%s","LoadBalancerInfo":{"ContainerName":"%s","ContainerPort":80},"PlatformVersion":"LATEST"}}}]}',
           },
         },
       },
@@ -135,8 +165,7 @@ export class AppDpBuildDefinition extends Construct {
 
               // Install SOCI Binaries
               'wget --quiet https://github.com/awslabs/soci-snapshotter/releases/download/v${SOCI_VERSION}/soci-snapshotter-${SOCI_VERSION}-linux-${CPU_ARCH}.tar.gz',
-              'tar xvzf soci-snapshootter-${SOCI_VERSION}-linux-amd64.tar.gz',
-              'mv soci /usr/local/bin/soci',
+              'tar -C /usr/local/bin -xvf soci-snapshootter-${SOCI_VERSION}-linux-amd64.tar.gz soci soci-snapshotter-grpc',
               'soci --version',
 
               // Install Docker Buildx
@@ -168,10 +197,24 @@ export class AppDpBuildDefinition extends Construct {
 
               // create and push multi-arch manifests
               // @link https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-multi-architecture-image.html
-              'docker manifest create --amend ${REPOSITORY_URI}:${COMMIT_ID} ${REPOSITORY_URI}:${COMMIT_ID}-amd64' + (props?.disableArm64Build ? '' : '${REPOSITORY_URI}:${COMMIT_ID}-arm64'),
+              'docker manifest create --amend ${REPOSITORY_URI}:${COMMIT_ID} ${REPOSITORY_URI}:${COMMIT_ID}-amd64' + (props?.disableArm64Build ? '' : ' ${REPOSITORY_URI}:${COMMIT_ID}-arm64'),
               'docker manifest push --purge ${REPOSITORY_URI}:${COMMIT_ID}',
             ],
           },
+          post_build: {
+            commands: [
+              // @link https://docs.aws.amazon.com/codepipeline/latest/userguide/file-reference.html
+              'printf \'{"ImageURI":"%s"}\' "${REPOSITORY_URI}:${COMMIT_ID}" > imageDetail.json',
+              'printf "${APP_SPEC_JSON_TEMPLATE}" "${TASK_DEFINITION_ARN}" "${CONTAINER_NAME}" > appspec.yaml',
+            ],
+          }
+        },
+        artifacts: {
+          files: [
+            'imageDetail.json',
+            'appspec.yaml',
+            'taskdef.json',
+          ],
         },
       }),
     });

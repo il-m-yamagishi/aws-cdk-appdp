@@ -63,6 +63,8 @@ const cliBuildDefinition = new AppDpBuildDefinition(this, 'CLI', {
 
 ```ts
 declare const vpc: ec2.Vpc;
+declare const executionRole: iam.IRole;
+declare const taskRole: iam.IRole;
 
 const cluster = new AppDpCluster(this, 'AppDpCluster', {
   vpc,

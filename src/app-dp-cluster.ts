@@ -16,21 +16,29 @@ export interface ServiceProps {
 
   /**
    * The desired number of tasks that should be running in the service
+   *
+   * @default - 1
    */
   readonly desiredCount?: number;
 
   /**
    * Whether to enable the execute command feature for the service
+   *
+   * @default - false
    */
   readonly enableExecuteCommand?: boolean;
 
   /**
    * The subnets that the service will be deployed to
+   *
+   * @default - undefined
    */
   readonly vpcSubnets?: SubnetSelection;
 
   /**
    * The security groups that will be attached to the service
+   *
+   * @default - []
    */
   readonly securityGroups?: ISecurityGroup[];
 }

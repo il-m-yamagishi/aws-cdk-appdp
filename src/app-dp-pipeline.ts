@@ -19,6 +19,7 @@ export interface AppDpPipelineProps {
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.CodeStarConnectionsSourceAction.html
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.S3SourceAction.html
    * @see https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_codepipeline_actions.GitHubSourceAction.html
+   *
    * Example:
    *
    * ```ts
@@ -68,6 +69,10 @@ export class AppDpPipeline extends Construct {
   public constructor(scope: Construct, id: string, props: AppDpPipelineProps) {
     super(scope, id);
 
+    if (props.buildDefinitions.length === 0) {
+      throw new Error('Build definitions cannot be empty');
+    }
+
     this.pipeline = new Pipeline(this, 'Pipeline', {
       pipelineName: `deploy-${id.toLowerCase()}`,
     });
@@ -94,5 +99,6 @@ export class AppDpPipeline extends Construct {
     });
 
     // Deploy stages
+    // TODO
   }
 }
